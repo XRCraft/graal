@@ -342,12 +342,30 @@ public abstract sealed class AbstractRuntimeClassRegistry extends AbstractClassR
         return externalName;
     }
 
-    private static Class<?> getEnclosingClass(ParserKlass parsed) {
+    private Class<?> getEnclosingClass(ParserKlass parsed) {
         InnerClassesAttribute innerClassesAttribute = (InnerClassesAttribute) parsed.getAttribute(InnerClassesAttribute.NAME);
         if (innerClassesAttribute == null) {
             return null;
         }
-        throw VMError.unimplemented("enclosing class is not supported yet");
+        ParserConstantPool pool = parsed.getConstantPool();
+        for (int i = 0; i < innerClassesAttribute.entryCount(); i++) {
+            InnerClassesAttribute.Entry entry = innerClassesAttribute.entryAt(i);
+            int innerClassIndex = entry.innerClassIndex;
+            if (innerClassIndex != 0) {
+                if (pool.className(innerClassIndex) == parsed.getName()) {
+                    if (entry.outerClassIndex == 0) {
+                        break;
+                    } else {
+                        Symbol<Name> outerName = pool.className(entry.outerClassIndex);
+                        try {
+                            return loadClass(ClassRegistries.getParsingContext().getOrCreateTypeFromName(pool.className(entry.outerClassIndex)));
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static String getSimpleBinaryName(ParserKlass parsed) {
