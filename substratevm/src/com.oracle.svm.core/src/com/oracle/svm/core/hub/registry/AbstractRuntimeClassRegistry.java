@@ -366,6 +366,7 @@ public abstract sealed class AbstractRuntimeClassRegistry extends AbstractClassR
                 }
             }
         }
+        return null;
     }
 
     private static String getSimpleBinaryName(ParserKlass parsed) {
