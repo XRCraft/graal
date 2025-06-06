@@ -447,7 +447,7 @@ public final class DynamicHub implements AnnotatedElement, java.lang.reflect.Typ
         Module module = null;
 
         DynamicHubCompanion companion = DynamicHubCompanion.createAtRuntime(module, superHub, sourceFileName, modifiers, classLoader, nestHost, simpleBinaryName, declaringClass, signature,
-                        interpreterType);
+                        null);
 
         /* Always allow unsafe allocation for classes that were loaded at run-time. */
         companion.canUnsafeAllocate = true;
@@ -499,9 +499,6 @@ public final class DynamicHub implements AnnotatedElement, java.lang.reflect.Typ
          * length for its vtable.
          */
         DynamicHub hub = SubstrateNewDynamicHubNode.allocate(DynamicHub.class, vTableEntries);
-
-        ResolvedJavaType interpreterType = RuntimeClassLoading.createInterpreterType(hub, type);
-        hub.setInterpreterType(interpreterType);
 
         DynamicHubOffsets dynamicHubOffsets = DynamicHubOffsets.singleton();
         /* Write fields in defining order. */
