@@ -446,9 +446,6 @@ public final class DynamicHub implements AnnotatedElement, java.lang.reflect.Typ
         // GR-62339
         Module module = null;
 
-        // GR-59683: Setup interpreter metadata at run-time.
-        ResolvedJavaType interpreterType = null;
-
         DynamicHubCompanion companion = DynamicHubCompanion.createAtRuntime(module, superHub, sourceFileName, modifiers, classLoader, nestHost, simpleBinaryName, declaringClass, signature,
                         interpreterType);
 
@@ -502,6 +499,9 @@ public final class DynamicHub implements AnnotatedElement, java.lang.reflect.Typ
          * length for its vtable.
          */
         DynamicHub hub = SubstrateNewDynamicHubNode.allocate(DynamicHub.class, vTableEntries);
+
+        ResolvedJavaType interpreterType = RuntimeClassLoading.createInterpreterType(hub, type);
+        hub.setInterpreterType(interpreterType);
 
         DynamicHubOffsets dynamicHubOffsets = DynamicHubOffsets.singleton();
         /* Write fields in defining order. */
